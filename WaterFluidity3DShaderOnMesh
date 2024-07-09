@@ -1,0 +1,32 @@
+shader_type spatial;
+
+uniform float time_scale : hint_range(0.0, 10.0) = 1.0; // Time scale for wave animation
+uniform float wave_amplitude : hint_range(0.0, 1.0) = 0.03; // Amplitude of the waves
+uniform float wave_frequency : hint_range(0.0, 10.0) = 0.5; // Frequency of the waves
+uniform float wave_speed : hint_range(0.0, 10.0) = 1.0; // Speed of the waves
+
+uniform float foam_intensity : hint_range(0.0, 1.0) = 0.3; // Intensity of the foam
+uniform float foam_coverage : hint_range(0.0, 1.0) = 0.2; // Coverage of the foam
+uniform float foam_threshold : hint_range(0.0, 1.0) = 0.9; // Threshold for foam appearance
+
+void vertex() {
+    // Calculate time-based offset
+    float time = TIME * time_scale;
+
+    // Calculate wave distortion
+    vec3 distortion = vec3(
+        sin(VERTEX.x * wave_frequency + time * wave_speed) * wave_amplitude,
+        0.0,
+        sin(VERTEX.z * wave_frequency + time * wave_speed) * wave_amplitude
+    );
+
+    // Apply distortion to vertex position
+    VERTEX += distortion;
+
+    // Calculate foam effect
+    vec2 foam_uv = VERTEX.xz * 3.0 + time * 0.3;
+    float foam = foam_intensity * smoothstep(foam_threshold, foam_threshold + foam_coverage, sin(foam_uv.x + foam_uv.y));
+
+    // Apply foam to vertex position
+    VERTEX.y += foam;
+}
