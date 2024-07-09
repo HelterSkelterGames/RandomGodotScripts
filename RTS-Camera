@@ -1,0 +1,48 @@
+extends Camera3D
+
+@export var speed : float = 10.0
+@export var fov_min : float = 20.0
+@export var fov_max : float = 90.0
+@export var zoom_speed : float = 2.0
+
+var right_mouse_button_pressed : bool = false
+var rotation_x : float = 0.0
+@export var rotation_x_min : float = -90.0
+@export var rotation_x_max : float = 90.0
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	handle_movement(delta)
+
+func handle_movement(delta):
+	var direction = Vector3.ZERO
+	if Input.is_action_pressed("move_forward"):
+		direction.z -= 1
+	if Input.is_action_pressed("move_backward"):
+		direction.z += 1
+	if Input.is_action_pressed("move_right"):
+		direction.x += 1
+	if Input.is_action_pressed("move_left"):
+		direction.x -= 1
+
+	if direction != Vector3.ZERO:
+		direction = direction.normalized()
+		global_transform.origin += (global_transform.basis * direction) * speed * delta
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			right_mouse_button_pressed = event.pressed
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			fov = clamp(fov - zoom_speed, fov_min, fov_max)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			fov = clamp(fov + zoom_speed, fov_min, fov_max)
+
+	if right_mouse_button_pressed and event is InputEventMouseMotion:
+		rotation_x = clamp(rotation_x - event.relative.y * 0.1, rotation_x_min, rotation_x_max)
+		rotate_y(deg_to_rad(-event.relative.x * 0.1))
+		rotation_degrees.x = rotation_x
