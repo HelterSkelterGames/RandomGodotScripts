@@ -1,0 +1,37 @@
+extends GridMap
+
+# Dictionary to store tile positions and their unique IDs
+var tile_ids = {}
+# Unique ID counter
+var current_id = 0
+
+func _ready():
+	assign_unique_ids()
+
+# Function to assign unique IDs to each tile
+func assign_unique_ids():
+	# Get the dimensions of the GridMap
+	var grid_size = Vector3(10, 10, 10)  # Adjust this to your grid's size
+	
+	# Iterate through each cell in the grid
+	for x in range(grid_size.x):
+		for y in range(grid_size.y):
+			for z in range(grid_size.z):
+				var cell_pos = Vector3(x, y, z)
+				# Check if the cell at this position is used
+				if get_cell_item(cell_pos) != -1:
+					# Assign the unique ID to this tile
+					tile_ids[cell_pos] = current_id
+					
+					# Print the position and the assigned ID for verification
+					print("Tile at position ", cell_pos, " has been assigned ID: ", current_id)
+					
+					# Increment the unique ID counter
+					current_id += 1
+
+# Function to get the ID of a tile at a specific position
+func get_tile_id(position):
+	if position in tile_ids:
+		return tile_ids[position]
+	else:
+		return -1  # Return -1 if the tile position is not found
