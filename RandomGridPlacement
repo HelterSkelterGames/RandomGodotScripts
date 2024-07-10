@@ -1,0 +1,57 @@
+extends GridMap
+
+# Function to spawn a character at a random position
+func _ready():
+	spawn_random_character()
+
+func spawn_random_character():
+	# Get the dimensions of the GridMap
+	var grid_size = Vector3i(10, 1, 10)  # Adjust this to your grid's size
+	
+	# Generate random coordinates within the grid size
+	var random_x = randi() % grid_size.x
+	var random_y = randi() % grid_size.y
+	var random_z = randi() % grid_size.z
+
+	# Create a Vector3i with the random coordinates
+	var random_position = Vector3i(random_x, random_y, random_z)
+
+	# Check if the selected cell is occupied (ensure it's a valid tile)
+	while get_cell_item(random_position) == -1:
+		random_x = randi() % grid_size.x
+		random_y = randi() % grid_size.y
+		random_z = randi() % grid_size.z
+		random_position = Vector3i(random_x, random_y, random_z)
+
+	# Convert grid position to world position
+	var world_position = map_to_world(random_position)
+
+	# Create the character directly in the script
+	var new_character = CharacterBody3D.new()
+	
+	# Customize the character (add a MeshInstance3D, CollisionShape3D, etc.)
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.mesh = CapsuleMesh.new()
+	
+	# Adjust the mesh position to ensure it does not sink into the ground
+	var mesh_size = Vector3(1, 1, 1)  # Assuming the mesh size is 1x1x1, adjust this as needed
+	mesh_instance.transform.origin = Vector3(0, mesh_size.y / 2, 0)
+	
+	new_character.add_child(mesh_instance)
+	
+	var collision_shape = CollisionShape3D.new()
+	var shape = BoxShape3D.new()
+	collision_shape.shape = shape
+	collision_shape.transform.origin = Vector3(0, mesh_size.y / 2, 0)
+	new_character.add_child(collision_shape)
+
+	# Set the position of the new_character so that it sits on top of the tile
+	new_character.transform.origin = world_position
+	add_child(new_character)  # Add the character as a child of the GridMap
+
+	print("Spawned character at position:", world_position)
+
+# Function to convert grid position to world position
+func map_to_world(grid_position: Vector3i) -> Vector3:
+	var cell_size = get_cell_size()
+	return Vector3(grid_position.x, grid_position.y, grid_position.z) * cell_size + cell_size / 2.0  # Center of the tile
