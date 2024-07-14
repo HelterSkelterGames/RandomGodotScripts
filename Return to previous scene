@@ -1,0 +1,12 @@
+#you must go to your Global script and add a variable with empty quotation marks and then enter each individual scene and do: Global.last_scene = "Menu" or "In_Game"
+
+func _input(event):
+	if Input.is_key_pressed(KEY_ESCAPE):
+			if global.last_scene == "Menu":
+				print("Switch to menu, escape pressed")
+				get_tree().change_scene_to_file("res://Scenes/Menu.tscn")
+			elif global.last_scene == "In_Game":
+				print("Switch to ingame menu, escape pressed")
+				get_tree().change_scene_to_file("res://Scenes/game_world.tscn")
+			else:
+				print("You have either come from debug directly or failed")
