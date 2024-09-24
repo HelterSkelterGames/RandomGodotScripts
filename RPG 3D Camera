@@ -1,0 +1,31 @@
+extends Node3D
+
+var OrigCamX = 0 #gathering x rotation
+var OrigCamy = 0
+var OrigCamz = 0
+
+var CurRotx = self.rotation.x
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	var movement_pressed = Input.is_action_pressed("back") or Input.is_action_pressed("forward") or Input.is_action_pressed("left") or Input.is_action_pressed("right")
+	if not movement_pressed:
+		if Input.is_action_pressed("cam_up"):
+			#rotation.y -= 1.0*delta
+			rotation.x -= 2.0*delta
+		if Input.is_action_pressed("cam_down"):
+			#rotation.y += 1.0*delta
+			rotation.x += 2.0*delta
+		if Input.is_action_pressed("cam_left"):
+			rotation.y += 2.0*delta
+		if Input.is_action_pressed("cam_right"):
+			rotation.y -= 2.0*delta
+	else:
+		#supposed to snap back to pos. if nothing is pressed, add move to center
+		self.rotation.x = OrigCamX
+		self.rotation.y = OrigCamy
+		self.rotation.z = OrigCamz
