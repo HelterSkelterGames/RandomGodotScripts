@@ -1,0 +1,9 @@
+extends Timer
+
+func _ready():
+	# Use the built-in set_wait_time and get_wait_time methods
+	set_wait_time(TimeManager.current_timer_time)  # Set the timer to 1.5 seconds
+	print("Current wait time: ", get_wait_time())  # Will print 1.5
+	
+	# Start the timer
+	start()
