@@ -1,0 +1,27 @@
+extends Camera3D
+
+
+@export var speed : float = 10.0
+@export var fov_min : float = 20.0
+@export var fov_max : float = 90.0
+@export var zoom_speed : float = 2.0
+
+var right_mouse_button_pressed : bool = false
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			right_mouse_button_pressed = event.pressed
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			fov = clamp(fov - zoom_speed, fov_min, fov_max)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			fov = clamp(fov + zoom_speed, fov_min, fov_max)
