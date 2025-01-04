@@ -1,0 +1,105 @@
+extends CharacterBody3D
+
+# Movement variables
+var speed = 15.0
+var acceleration = 4.0
+var gravity = -9.8
+var jump_strength = 8.0
+var mouse_sensitivity = 0.005
+
+var movement = false #handles running
+
+# Camera reference (ensure this is properly set in the inspector or via code)
+@export var camera: Camera3D
+
+# Movement velocity
+var current_velocity: Vector3 = Vector3.ZERO
+
+
+
+
+func _ready():
+	# Ensure the camera is set properly
+	if camera == null:
+		camera = $Camera3D  # Assuming the camera is a child of the player, adjust if needed
+	
+	# Capture the mouse for first-person look control
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func _input(event):
+	# Ensure the camera exists before calling rotate methods
+	if camera != null:
+		# Rotate player and camera based on mouse movement
+		if event is InputEventMouseMotion:
+			rotate_y(-event.relative.x * mouse_sensitivity)  # Rotate player (yaw)
+			camera.rotate_x(-event.relative.y * mouse_sensitivity)  # Rotate camera (pitch)
+
+			# Clamp the camera's up/down rotation to avoid flipping
+			camera.rotation_degrees.x = clamp(camera.rotation_degrees.x, -80, 80)
+
+func _physics_process(delta):
+	handle_movement(delta)
+	apply_gravity(delta)
+		#................Running...............
+	if Input.is_action_just_pressed("faster") and movement == true:
+		speed = 30.0
+		Global.run_active = true
+	if Input.is_action_just_released("faster"):
+		speed = 15.0
+		Global.run_active = false
+
+func handle_movement(delta):
+	var direction = Vector3.ZERO
+
+	# Get movement inputs and move in the direction relative to where the player is looking
+	if Input.is_action_pressed("forward"):
+		direction -= transform.basis.z  # Move forward
+		movement = true
+	if Input.is_action_pressed("backward"):
+		direction += transform.basis.z  # Move backward
+		movement = true
+	if Input.is_action_pressed("left"):
+		direction -= transform.basis.x  # Move left
+		movement = true
+	if Input.is_action_pressed("right"):
+		direction += transform.basis.x  # Move right
+		movement = true
+	
+	#inverse --- For Running ---
+	if Input.is_action_just_released("forward"):
+		movement = false
+	if Input.is_action_just_released("backward"):
+		movement = false
+	if Input.is_action_just_released("left"):
+		movement = false
+	if Input.is_action_just_released("right"):
+		movement = false
+		
+		
+	# Normalize direction vector for consistent speed
+	if direction != Vector3.ZERO:
+		direction = direction.normalized()
+
+	# Update velocity in the X and Z directions (horizontal movement)
+	var horizontal_velocity = current_velocity
+	horizontal_velocity.x = lerp(horizontal_velocity.x, direction.x * speed, acceleration * delta)
+	horizontal_velocity.z = lerp(horizontal_velocity.z, direction.z * speed, acceleration * delta)
+
+	# Set the new velocity to the CharacterBody3D
+	set_velocity(horizontal_velocity)
+
+	# Apply the movement
+	move_and_slide()
+	
+
+func apply_gravity(delta):
+	var velocity = get_velocity()
+
+	# Apply gravity to the Y axis
+	if not is_on_floor():
+		velocity.y += gravity * delta
+	else:
+		velocity.y = 0
+
+	set_velocity(velocity)
+	move_and_slide()
