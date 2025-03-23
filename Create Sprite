@@ -1,0 +1,9 @@
+extends Node2D
+
+var villager = Sprite2D.new()
+
+func _ready() -> void:
+	villager.texture = load("res://Images/New Project - 2025-03-23T185722.301.png") #Chooses photo
+	villager.scale.x = 0.056 #resizes the image
+	villager.scale.y = 0.056
+	$".".add_child(villager) #Creates Sprite under Node 'Sprite'
