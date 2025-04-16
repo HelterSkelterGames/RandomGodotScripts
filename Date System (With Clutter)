@@ -1,0 +1,141 @@
+extends Label
+
+@onready var anim = $"../../../BritishArrival"
+
+var st = [1, 21, ]
+var rd = [3, 23, ]
+var nd = [2, 22,]
+var th = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 30]
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+	self.text = "" +str(Global.month) +str(" ") +str(Global.day) +str(Global.suffix) +str(" ") +str(Global.year)
+	$"../../../TimerGame".start()
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+func checkmonth():
+	#Check Christmas Time
+	if Global.month == "December":
+		print("Merry Christmas")
+
+func MonthOp():
+	if Global.day == 32 and Global.month == "January":
+		Global.month = "Febuary"
+		Global.day = 1
+	if Global.day == 29 and Global.month == "Febuary":
+		Global.month = "March"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "March":
+		Global.month = "April"
+		Global.day = 1
+	if Global.day == 31 and Global.month == "April":
+		Global.month = "May"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "May":
+		Global.month = "June"
+		Global.day = 1
+	if Global.day == 31 and Global.month == "June":
+		Global.month = "July"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "July":
+		Global.month = "August"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "August":
+		Global.month = "September"
+		Global.day = 1
+	if Global.day == 31 and Global.month == "September":
+		Global.month = "October"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "October":
+		Global.month = "November"
+		Global.day = 1
+	if Global.day == 31 and Global.month == "November":
+		Global.month = "December"
+		Global.day = 1
+	if Global.day == 32 and Global.month == "December":
+		Global.month = "January"
+		Global.day = 1
+		Global.year = Global.year + 1
+
+func daytext():
+	if Global.day in st:
+		Global.suffix = "st"
+	if Global.day in nd:
+		Global.suffix = "nd"
+	if Global.day in rd:
+		Global.suffix = "rd"
+	if Global.day in th:
+		Global.suffix = "th"
+func _on_timer_timeout():
+	pass # Replace with function body.
+	Global.day = Global.day + 1
+	MonthOp()
+	daytext()
+	self.text = "" +str(Global.month) +str(" ") +str(Global.day) +str(Global.suffix) +str(" ") +str(Global.year)
+	Global.food = Global.food - 3
+	Global.waterdrink = Global.waterdrink - 1
+	Global.days_survived = Global.days_survived + 1
+	if Global.food == 0:
+		Global.health = Global.health - 10
+		Global.horse_health = Global.horse_health - 20
+	#death causes
+	if Global.health == 0 and Global.food == 0:
+		get_tree().change_scene_to_file("res://GameOver.tscn")
+		Global.death_cause = "Starvation"
+	if Global.horse_health == 0:
+		get_tree().change_scene_to_file("res://GameOver.tscn")
+		Global.death_cause = "Horse is dead, stranded"
+	#british chance
+	Global.endnum = Global.endnum - 3
+	if Global.endnum <= 0: #disallows going into negatives
+		Global.endnum = 1
+	var rng = RandomNumberGenerator.new()
+	var my_random_number = rng.randi_range(0, Global.endnum)
+	if my_random_number == 1:
+		print("It's Britain time")
+		#play animation
+		$"../../../CharacterControls/Britain/Node2D/NewProject(70)".visible = true
+		anim.play("British")
+		Global.britisharrival = true
+	var rng2 = RandomNumberGenerator.new()
+	var my_random_number2 = rng.randi_range(0, 30)
+	if my_random_number2 == 1:
+		Global.dysentary = true
+		Global.health = Global.health - 5
+	if my_random_number2 == 3:
+		Global.frostbite = true
+		Global.health = Global.health - 35
+		if Global.health == 0:
+			Global.death_cause == "Frostbite"
+			get_tree().change_scene_to_file("res://GameOver.tscn")
+	if my_random_number2 == 11:
+		Global.smallpox = true
+		Global.health = Global.health - 5
+		if Global.health == 0:
+			Global.death_cause == "Smallpox"
+			get_tree().change_scene_to_file("res://GameOver.tscn")
+	if my_random_number2 == 22:
+		Global.malaria = true
+		Global.health = Global.health - 20
+		if Global.health == 0:
+			Global.death_cause == "Malaria"
+			get_tree().change_scene_to_file("res://GameOver.tscn")
+	if Global.waterdrink == 0:
+		Global.health - 10
+		Global.horse_health - 20
+	if Global.waterdrink <= 0:
+		Global.waterdrink = 0
+	if Global.food <= 0:
+		Global.food = 0
+	if Global.food == 0:
+		Global.health = Global.health - 10
+		Global.horse_health = Global.horse_health - 20
+
+func _on_every_sec_timeout():
+	Global.frame_day = Global.frame_day + 1
+	if Global.frame_day == 150:
+		Global.frame_day = 0
+	$"../../../AnimationPlayer".frame = Global.frame_day
