@@ -1,0 +1,19 @@
+extends Control
+
+var current_honour: float = 50.0 # This can be updated dynamically
+
+func _ready() -> void:
+	update_honour_marker()
+
+func update_honour_marker():
+	var honour = clamp(current_honour, 0, 100)
+
+	var bar = $Honour_Line
+	var marker = $Honour_Indicator
+
+	var bar_width = bar.rect_size.x
+	var honour_ratio = honour / 100.0
+	var marker_x = honour_ratio * bar_width
+
+	# Position the marker relative to the bar
+	marker.rect_position = Vector2(bar.rect_position.x + marker_x - (marker.rect_size.x / 2), marker.rect_position.y)
